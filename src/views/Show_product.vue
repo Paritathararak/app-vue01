@@ -1,38 +1,77 @@
 <template>
-  <div class="container my-5">
-    <!-- หัวข้อหลัก -->
+
+
+ <div class="container my-5">
+
+
+
+    
     <h2 class="text-center mb-4">รายการสินค้า</h2>
 
-    <!-- ใช้ Bootstrap แบ่ง row -->
-    <div class="row">
-      <!-- วน loop แสดงสินค้าแต่ละตัว ด้วย v-for -->
-      <div class="col-md-3" v-for="data in Alldata" :key="data.id">
+    <!-- Loading -->
+    <div v-if="loading" class="text-center my-5">
+      <div class="spinner-border text-primary"></div>
+      <p class="mt-2">กำลังโหลดข้อมูล...</p>
+    </div>
 
-        <!-- card แสดงข้อมูลสินค้า -->
-        <div class="card shadow-sm mb-4">
-          <!-- แสดงรูปสินค้า โดย path รูปมาจาก server -->
+    <!-- Error -->
+    <div v-else-if="error" class="alert alert-danger text-center">
+      {{ error }}
+    </div>
+
+    <!-- Product List -->
+    <div v-else class="row">
+      <div 
+        class="col-md-3 mb-4" 
+        v-for="data in Alldata" 
+        :key="data.product_id"
+      >
+
+        <div class="card h-100 shadow-sm">
+
+          <!-- รูปสินค้า -->
           <img
-             :src="'http://localhost/app-vue01/php_api/image/' + data.image"
-            width="70%"
-            height="300"
+            :src="getImage(data.image)"
             class="card-img-top"
-            :alt="data.name"
+            style="height:250px; object-fit:cover;"
+            :alt="data.product_name"
           >
 
-          <!-- เนื้อหาใน card -->
+          <!-- เนื้อหา -->
           <div class="card-body text-center">
-            <h5 class="card-title">{{ data.product_name }}</h5> <!-- ชื่อสินค้า -->
-            <p class="card-text">{{ data.price }} บาท</p>       <!-- ราคาสินค้า -->
-            <button class="btn btn-primary">สั่งซื้อ</button>      <!-- ปุ่มสั่งซื้อ -->
+            <h6 class="card-title">
+              {{ data.product_name }}
+            </h6>
+
+            <p class="text-primary fw-bold fs-5">
+              {{ formatPrice(data.price) }} บาท
+            </p>
           </div>
+
+          <!-- ปุ่ม -->
+          <div class="card-footer bg-white border-0">
+
+            <router-link 
+              :to="'/ProductDetail?id=' + data.product_id"
+              class="btn btn-sm btn-outline-primary w-100 mb-2"
+            >
+              ดูรายละเอียด
+            </router-link>
+
+            <button 
+              class="btn btn-sm btn-primary w-100"
+              @click="addToCart(data)"
+            >
+              เพิ่มลงตะกร้า
+            </button>
+
+          </div>
+
         </div>
       </div>
     </div>
   </div>
 </template>
-
-
-
 
 <script>
 import { ref, onMounted } from "vue";
@@ -40,18 +79,45 @@ import { ref, onMounted } from "vue";
 export default {
   name: "DataList",
   setup() {
+
     const Alldata = ref([]);
     const loading = ref(true);
     const error = ref(null);
 
-    // ฟังก์ชันดึงข้อมูลจาก API
+    // จัดรูปแบบราคา
+    const formatPrice = (price) => {
+      return new Intl.NumberFormat("th-TH").format(price);
+    };
+
+    // สร้าง URL รูปภาพ
+    const getImage = (image) => {
+      if (!image) {
+        return "https://via.placeholder.com/300x200?text=No+Image";
+      }
+      return `http://localhost/app-vue01/php_api/uploads/${image}`;
+    };
+
+    // เพิ่มลงตะกร้า
+    const addToCart = (product) => {
+      let cart = JSON.parse(localStorage.getItem("cart")) || [];
+      cart.push(product);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      alert(`เพิ่ม ${product.product_name} ลงตะกร้าแล้ว 🛒`);
+    };
+
+    // ดึงข้อมูลจาก API
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost/app-vue01/php_api/show_product.php");
+        const response = await fetch(
+          "http://localhost/app-vue01/php_api/show_product.php"
+        );
+
         if (!response.ok) {
           throw new Error("ไม่สามารถดึงข้อมูลได้");
         }
+
         Alldata.value = await response.json();
+
       } catch (err) {
         error.value = err.message;
       } finally {
@@ -66,8 +132,22 @@ export default {
     return {
       Alldata,
       loading,
-      error
+      error,
+      formatPrice,
+      getImage,
+      addToCart
     };
   }
 };
 </script>
+
+<style>
+.card {
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+</style>

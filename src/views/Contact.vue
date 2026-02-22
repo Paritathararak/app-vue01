@@ -1,11 +1,22 @@
 <template>
+
   <div class="container">
-    <h1>Contact to Nongyao Sornjapo</h1>
-    <h3>Tel.038-743-690</h3>
-    <img alt="Vue logo" src="../assets/cat.jpg" />
+
+    <!-- ✅ Hero / Banner -->
+    <div class="bg-light p-5 mb-4 shadow-sm rounded">
+      <div class="container text-center">
+        <h1 class="fw-bold">ยินดีต้อนรับสู่ ร้าน Jenny.j แม่ค้าคนสวย และน่ารักที่สู๊ดดด</h1>
+        <p class="text-muted">สินค้าคุณภาพระดับพรีเมี่ยม ราคาพิเศษช่วงโปรโมชั่น</p>
+        <a class="btn btn-primary" href="/show_product" role="button">เลือกซื้อสินค้าได้เลยนะงับ  ลูกค้าที่น่ารักทุกคน</a>
+      </div>
+    </div>
+    <h1>Contact to Parita Thararak (jenny)</h1>
+    <h3>Tel.092-467-0266</h3>
+    <img alt="Vue logo" src="../assets/sea.jpg" />
     <br /><br /><br />
 
     <div class="container">
+      
       <div class="row">
         <!--column 1 -->
         <div class="col-sm-6">
